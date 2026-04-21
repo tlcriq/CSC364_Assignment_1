@@ -10,7 +10,7 @@ import glob
 # The purpose of this function is to set up a socket connection.
 def create_socket(host, port):
     # 1. Create a socket.
-    soc = socket.socket() #TODO: Add parameters?
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # 2. Try connecting the socket to the host and port.
     try:
         soc.connect((host, port))
@@ -111,7 +111,7 @@ def ip_to_bin(ip : str):
 
 
 # The purpose of this function is to find the range of IPs inside a given a destination IP address/subnet mask pair.
-def find_ip_range(network_dst, netmask):
+def find_ip_range(network_dst : int, netmask : int) -> list[int]:
     # 1. Perform a bitwise AND on the network destination and netmask
     # to get the minimum IP address in the range.
     bitwise_and = network_dst & netmask
@@ -156,8 +156,8 @@ for f in files:
     os.remove(f)
 
 # 1. Connect to the appropriate sending ports (based on the network topology diagram).
-r2 = create_socket("10.0.0.17",8002)
-#TODO: rest of these
+r2 = create_socket("localhost",8002)
+r4 = create_socket("localhost",8004)
 
 # 2. Read in and store the forwarding table.
 forwarding_table = read_csv("input/router_1_table.csv")
@@ -183,30 +183,36 @@ for packet in packets_table:
 
     # 9. Convert the destination IP into an integer for comparison purposes.
     destinationIP_bin = ip_to_bin(destinationIP)
-    destinationIP_int = ...
+    destinationIP_int = destinationIP_bin
 
     # 9. Find the appropriate sending port to forward this new packet to.
-    ## ...
+    dest_port = 0
+    for i in range(1,len(forwarding_table)):
+        if(destinationIP_int > forwarding_table_with_range[i][0] 
+           and destinationIP_int<forwarding_table_with_range[i][1]):
+            dest_port = forwarding_table[i][3]
 
     # 10. If no port is found, then set the sending port to the default port.
-    ## ...
+    if dest_port==0: dest_port = default_gateway_port
 
     # 11. Either
     # (a) send the new packet to the appropriate port (and append it to sent_by_router_1.txt),
     # (b) append the payload to out_router_1.txt without forwarding because this router is the last hop, or
     # (c) append the new packet to discarded_by_router_1.txt and do not forward the new packet
-    ## if ...:
-'''     print("sending packet", new_packet, "to Router 2")
-        ## ...
-    ## elif ...
-        print("sending packet", new_packet, "to Router 4")
-        ## ...
-    ## elif ...:
+    
+    if ...:
         print("OUT:", payload)
         ## ...
-    else:
+    elif ttl==0:
         print("DISCARD:", new_packet)
         ## ...
+    elif dest_port==8004:
+        print("sending packet", new_packet, "to Router 4")
+        ...
+    else:
+        print("sending packet", new_packet, "to Router 2")
+        ## ...
+        
 
     # Sleep for some time before sending the next packet (for debugging purposes)
-    time.sleep(1)'''
+    time.sleep(1)
