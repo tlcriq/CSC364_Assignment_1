@@ -43,6 +43,7 @@ def read_csv(path) -> list[list[str]]:
     return table_list
 
 
+
 # The purpose of this function is to find the default port
 # when no match is found in the forwarding table for a packet's destination IP.
 def find_default_gateway(table):
@@ -167,7 +168,7 @@ default_gateway_port = forwarding_table[0][3]
 forwarding_table_with_range = generate_forwarding_table_with_range(forwarding_table)
 
 # 5. Read in and store the packets.
-packets_table = read_csv("packets.csv")
+packets_table = read_csv("input/packets.csv")
 
 # 6. For each packet,
 for packet in packets_table:
@@ -177,9 +178,10 @@ for packet in packets_table:
     payload = packet[2]
     ttl = int(packet[3])
 
+
     # 8. Decrement the TTL by 1 and construct a new packet with the new TTL.
     new_ttl = ttl-1
-    new_packet = [sourceIP, destinationIP, payload, new_ttl]
+    new_packet = sourceIP +","+ destinationIP +","+ payload +","+ str(new_ttl)
 
     # 9. Convert the destination IP into an integer for comparison purposes.
     destinationIP_bin = ip_to_bin(destinationIP)
@@ -187,31 +189,32 @@ for packet in packets_table:
 
     # 9. Find the appropriate sending port to forward this new packet to.
     dest_port = 0
-    for i in range(1,len(forwarding_table)):
+    for i in range(1,len(forwarding_table_with_range)):
         if(destinationIP_int > forwarding_table_with_range[i][0] 
            and destinationIP_int<forwarding_table_with_range[i][1]):
-            dest_port = forwarding_table[i][3]
-
+            dest_port = forwarding_table_with_range[i][3]
     # 10. If no port is found, then set the sending port to the default port.
     if dest_port==0: dest_port = default_gateway_port
-
+    
     # 11. Either
     # (a) send the new packet to the appropriate port (and append it to sent_by_router_1.txt),
     # (b) append the payload to out_router_1.txt without forwarding because this router is the last hop, or
     # (c) append the new packet to discarded_by_router_1.txt and do not forward the new packet
     
-    if ...:
+    if dest_port=="127.0.0.1":
         print("OUT:", payload)
-        ## ...
+        write_to_file("output/out_router_1.txt",new_packet)
     elif ttl==0:
         print("DISCARD:", new_packet)
-        ## ...
+        write_to_file("output/discarded_by_router_1.txt",new_packet)
     elif dest_port==8004:
         print("sending packet", new_packet, "to Router 4")
-        ...
+        write_to_file("output/sent_by_router_1.txt",new_packet)
+        r4.send(new_packet.encode())
     else:
         print("sending packet", new_packet, "to Router 2")
-        ## ...
+        write_to_file("output/sent_by_router_1.txt",new_packet)
+        r2.send(new_packet.encode())
         
 
     # Sleep for some time before sending the next packet (for debugging purposes)

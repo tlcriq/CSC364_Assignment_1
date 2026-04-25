@@ -172,7 +172,7 @@ def write_to_file(path, packet_to_write, send_to_router=None):
 def start_server():
     # 1. Create a socket.
     host = "localhost"
-    port = 8002
+    port = 8004
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     print("Socket created")
@@ -187,9 +187,9 @@ def start_server():
     print("Socket now listening")
 
     # 4. Read in and store the forwarding table.
-    forwarding_table = read_csv("input/router_2_table.csv")
+    forwarding_table = read_csv("input/router_4_table.csv")
     # 5. Store the default gateway port.
-    default_gateway_port = 8004
+    default_gateway_port = 8005
     # 6. Generate a new forwarding table that includes the IP ranges for matching against destination IPS.
     forwarding_table_with_range = generate_forwarding_table_with_range(forwarding_table)
 
@@ -197,7 +197,7 @@ def start_server():
     while True:
         # 8. Accept the connection.
         connection, address = soc.accept()
-        ip, port = "127.0.0.1", "8002"
+        ip, port = "127.0.0.1", "8004"
         print("Connected with ", ip, ":", port)
         # 9. Start a new thread for receiving and processing the incoming packets.
         try:
@@ -212,8 +212,8 @@ def start_server():
 # The purpose of this function is to receive and process incoming packets.
 def processing_thread(connection: socket.socket, ip, port, forwarding_table_with_range, default_gateway_port, max_buffer_size=5120):
     # 1. Connect to the appropriate sending ports (based on the network topology diagram).
-    r3 = create_socket("localhost",8003)
-    r4 = create_socket("localhost",8004)
+    r5 = create_socket("localhost",8005)
+    r6 = create_socket("localhost",8006)
 
     # 2. Continuously process incoming packets
     while True:
@@ -254,18 +254,18 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
         # (c) append the new packet to discarded_by_router_2.txt and do not forward the new packet
         if dest_port=="127.0.0.1":
             print("OUT:", payload)
-            write_to_file("output/out_router_2.txt",new_packet)
+            write_to_file("output/out_router_4.txt",new_packet)
         elif ttl==0:
             print("DISCARD:", new_packet)
-            write_to_file("output/discarded_by_router_2.txt",new_packet)
-        elif dest_port==8003:
-            print("sending packet", new_packet, "to Router 3")
-            write_to_file("output/sent_by_router_2.txt",new_packet)
-            r3.send(new_packet.encode())
+            write_to_file("output/discarded_by_router_4.txt",new_packet)
+        elif dest_port==8006:
+            print("sending packet", new_packet, "to Router 6")
+            write_to_file("output/sent_by_router_4.txt",new_packet)
+            r6.send(new_packet.encode())
         else:
-            print("sending packet", new_packet, "to Router 4")
-            write_to_file("output/sent_by_router_2.txt",new_packet)
-            r4.send(new_packet.encode())
+            print("sending packet", new_packet, "to Router 5")
+            write_to_file("output/sent_by_router_4.txt",new_packet)
+            r5.send(new_packet.encode())
 
 
 # Main Program
