@@ -163,7 +163,7 @@ r4 = create_socket("localhost",8004)
 # 2. Read in and store the forwarding table.
 forwarding_table = read_csv("input/router_1_table.csv")
 # 3. Store the default gateway port.
-default_gateway_port = forwarding_table[0][3]
+default_gateway_port = find_default_gateway(forwarding_table)
 # 4. Generate a new forwarding table that includes the IP ranges for matching against destination IPS.
 forwarding_table_with_range = generate_forwarding_table_with_range(forwarding_table)
 
@@ -186,6 +186,7 @@ for packet in packets_table:
     # 9. Convert the destination IP into an integer for comparison purposes.
     destinationIP_bin = ip_to_bin(destinationIP)
     destinationIP_int = destinationIP_bin
+    print(destinationIP_int, " ", forwarding_table_with_range[1][0],forwarding_table_with_range[1][1])
 
     # 9. Find the appropriate sending port to forward this new packet to.
     dest_port = 0
@@ -201,13 +202,13 @@ for packet in packets_table:
     # (b) append the payload to out_router_1.txt without forwarding because this router is the last hop, or
     # (c) append the new packet to discarded_by_router_1.txt and do not forward the new packet
     
-    if dest_port=="127.0.0.1":
+    if destinationIP=="127.0.0.1":
         print("OUT:", payload)
-        write_to_file("output/out_router_1.txt",new_packet)
-    elif ttl==0:
+        write_to_file("output/out_router_1.txt",payload)
+    elif new_ttl==0:
         print("DISCARD:", new_packet)
         write_to_file("output/discarded_by_router_1.txt",new_packet)
-    elif dest_port==8004:
+    elif dest_port=="8004":
         print("sending packet", new_packet, "to Router 4")
         write_to_file("output/sent_by_router_1.txt",new_packet)
         r4.send(new_packet.encode())

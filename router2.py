@@ -143,7 +143,7 @@ def receive_packet(connection : socket.socket, max_buffer_size):
     decoded_packet = received_packet.decode().strip()
     # 3. Append the packet to received_by_router_2.txt.
     print("received packet", decoded_packet)
-    open("recieved_by_router_2.txt","a").write(decoded_packet)
+    write_to_file("output/recieved_by_router_2.txt", decoded_packet)
     # 4. Split the packet by the delimiter.
     packet = decoded_packet.split(',')
     # 5. Return the list representation of the packet.
@@ -189,7 +189,7 @@ def start_server():
     # 4. Read in and store the forwarding table.
     forwarding_table = read_csv("input/router_2_table.csv")
     # 5. Store the default gateway port.
-    default_gateway_port = 8004
+    default_gateway_port = find_default_gateway(forwarding_table)
     # 6. Generate a new forwarding table that includes the IP ranges for matching against destination IPS.
     forwarding_table_with_range = generate_forwarding_table_with_range(forwarding_table)
 
@@ -252,13 +252,13 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
         # (a) send the new packet to the appropriate port (and append it to sent_by_router_2.txt),
         # (b) append the payload to out_router_2.txt without forwarding because this router is the last hop, or
         # (c) append the new packet to discarded_by_router_2.txt and do not forward the new packet
-        if dest_port=="127.0.0.1":
+        if destinationIP=="127.0.0.1":
             print("OUT:", payload)
-            write_to_file("output/out_router_2.txt",new_packet)
-        elif ttl==0:
+            write_to_file("output/out_router_2.txt",payload)
+        elif new_ttl==0:
             print("DISCARD:", new_packet)
             write_to_file("output/discarded_by_router_2.txt",new_packet)
-        elif dest_port==8003:
+        elif dest_port=="8003":
             print("sending packet", new_packet, "to Router 3")
             write_to_file("output/sent_by_router_2.txt",new_packet)
             r3.send(new_packet.encode())
