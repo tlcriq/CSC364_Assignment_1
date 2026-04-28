@@ -240,9 +240,9 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
 
         # 8. Find the appropriate sending port to forward this new packet to.
         dest_port = 0
-        for i in range(1,len(forwarding_table_with_range)):
-            if(destinationIP_int > forwarding_table_with_range[i][0] 
-                and destinationIP_int<forwarding_table_with_range[i][1]):
+        for i in range(0,len(forwarding_table_with_range)):
+            if(destinationIP_int >= forwarding_table_with_range[i][0] 
+                and destinationIP_int <= forwarding_table_with_range[i][1]):
                 dest_port = forwarding_table_with_range[i][3]
 
         # 9. If no port is found, then set the sending port to the default port.

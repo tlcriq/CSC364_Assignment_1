@@ -240,9 +240,9 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
 
         # 8. Find the appropriate sending port to forward this new packet to.
         dest_port = 0
-        for i in range(1,len(forwarding_table_with_range)):
-            if(destinationIP_int > forwarding_table_with_range[i][0] 
-                and destinationIP_int<forwarding_table_with_range[i][1]):
+        for i in range(0,len(forwarding_table_with_range)):
+            if(destinationIP_int >= forwarding_table_with_range[i][0] 
+                and destinationIP_int <= forwarding_table_with_range[i][1]):
                 dest_port = forwarding_table_with_range[i][3]
 
         # 9. If no port is found, then set the sending port to the default port.
@@ -255,7 +255,7 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
         print(dest_port," ",destinationIP)
         if dest_port=="127.0.0.1":
             print("OUT:", payload)
-            write_to_file("output/out_router_4.txt",new_packet)
+            write_to_file("output/out_router_4.txt",payload)
         elif new_ttl==0:
             print("DISCARD:", new_packet)
             write_to_file("output/discarded_by_router_4.txt",new_packet)

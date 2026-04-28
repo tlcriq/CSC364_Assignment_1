@@ -186,13 +186,12 @@ for packet in packets_table:
     # 9. Convert the destination IP into an integer for comparison purposes.
     destinationIP_bin = ip_to_bin(destinationIP)
     destinationIP_int = destinationIP_bin
-    print(destinationIP_int, " ", forwarding_table_with_range[0][0],forwarding_table_with_range[0][1])
 
     # 9. Find the appropriate sending port to forward this new packet to.
     dest_port = 0
     for i in range(0,len(forwarding_table_with_range)):
-        if(destinationIP_int > forwarding_table_with_range[i][0] 
-           and destinationIP_int<forwarding_table_with_range[i][1]):
+        if(destinationIP_int >= forwarding_table_with_range[i][0] 
+           and destinationIP_int <= forwarding_table_with_range[i][1]):
             dest_port = forwarding_table_with_range[i][3]
     # 10. If no port is found, then set the sending port to the default port.
     if dest_port==0: dest_port = default_gateway_port
