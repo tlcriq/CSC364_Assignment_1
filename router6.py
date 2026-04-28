@@ -250,7 +250,7 @@ def processing_thread(connection: socket.socket, ip, port, forwarding_table_with
         # (a) send the new packet to the appropriate port (and append it to sent_by_router_2.txt),
         # (b) append the payload to out_router_2.txt without forwarding because this router is the last hop, or
         # (c) append the new packet to discarded_by_router_2.txt and do not forward the new packet
-        if destinationIP=="127.0.0.1":
+        if dest_port=="127.0.0.1":
             print("OUT:", payload)
             write_to_file("output/out_router_6.txt",payload)
         else:

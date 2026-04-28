@@ -186,11 +186,11 @@ for packet in packets_table:
     # 9. Convert the destination IP into an integer for comparison purposes.
     destinationIP_bin = ip_to_bin(destinationIP)
     destinationIP_int = destinationIP_bin
-    print(destinationIP_int, " ", forwarding_table_with_range[1][0],forwarding_table_with_range[1][1])
+    print(destinationIP_int, " ", forwarding_table_with_range[0][0],forwarding_table_with_range[0][1])
 
     # 9. Find the appropriate sending port to forward this new packet to.
     dest_port = 0
-    for i in range(1,len(forwarding_table_with_range)):
+    for i in range(0,len(forwarding_table_with_range)):
         if(destinationIP_int > forwarding_table_with_range[i][0] 
            and destinationIP_int<forwarding_table_with_range[i][1]):
             dest_port = forwarding_table_with_range[i][3]
@@ -202,7 +202,7 @@ for packet in packets_table:
     # (b) append the payload to out_router_1.txt without forwarding because this router is the last hop, or
     # (c) append the new packet to discarded_by_router_1.txt and do not forward the new packet
     
-    if destinationIP=="127.0.0.1":
+    if dest_port=="127.0.0.1":
         print("OUT:", payload)
         write_to_file("output/out_router_1.txt",payload)
     elif new_ttl==0:
